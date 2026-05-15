@@ -43,8 +43,5 @@ RUN mkdir -p /app/files /app/logs
 ENV JAVA_OPTS="-Xmx512m -Xms256m"
 ENV SPRING_PROFILES_ACTIVE=pro
 
-# 持久化卷
-VOLUME ["/app/files", "/app/logs"]
-
 # 启动命令：使用 Railway 注入的 $PORT
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -Dserver.port=${PORT:-8080} -jar app.jar"]
