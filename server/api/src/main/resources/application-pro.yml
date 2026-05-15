@@ -1,0 +1,27 @@
+server:
+  port: ${PORT:1991}  # Railway 会通过 $PORT 环境变量注入端口
+  servlet:
+    session:
+      timeout: 1h
+  compression:
+    enabled: true
+    min-response-size: 1024
+file-storage:
+  local:
+    root-path: ./files
+custom-cache:
+  entries:
+    projectCache: 1d
+    fileCache: 1h
+    userCache: 1d
+    deptCache: 1d
+    projectPermissionCache: 1d
+    commonCache: 30d
+
+# Railway 部署：数据库连接从环境变量读取（优先级最高）
+spring:
+  datasource:
+    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/surveyking?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${SPRING_DATASOURCE_USERNAME:root}
+    password: ${SPRING_DATASOURCE_PASSWORD:123456}

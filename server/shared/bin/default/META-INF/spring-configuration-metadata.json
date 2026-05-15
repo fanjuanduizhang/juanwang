@@ -1,0 +1,87 @@
+{
+  "groups": [
+    {
+      "name": "custom-cache",
+      "type": "cn.surveyking.server.core.config.CacheConfig",
+      "sourceType": "cn.surveyking.server.core.config.CacheConfig"
+    },
+    {
+      "name": "file-storage",
+      "type": "cn.surveyking.server.storage.StorageProperties",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties"
+    },
+    {
+      "name": "file-storage.local",
+      "type": "cn.surveyking.server.storage.StorageProperties$LocalStorage",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties",
+      "sourceMethod": "public cn.surveyking.server.storage.StorageProperties.LocalStorage getLocal() "
+    },
+    {
+      "name": "file-storage.thumb-image",
+      "type": "cn.surveyking.server.storage.StorageProperties$ThumbImage",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties",
+      "sourceMethod": "public cn.surveyking.server.storage.StorageProperties.ThumbImage getThumbImage() "
+    },
+    {
+      "name": "sk.security",
+      "type": "cn.surveyking.server.core.config.WebSecurityConfig",
+      "sourceType": "cn.surveyking.server.core.config.WebSecurityConfig"
+    },
+    {
+      "name": "sk.security.url-token-authentication",
+      "type": "cn.surveyking.server.core.config.WebSecurityConfig$UrlTokenAuthentication",
+      "sourceType": "cn.surveyking.server.core.config.WebSecurityConfig",
+      "sourceMethod": "public cn.surveyking.server.core.config.WebSecurityConfig.UrlTokenAuthentication getUrlTokenAuthentication() "
+    }
+  ],
+  "properties": [
+    {
+      "name": "custom-cache.entries",
+      "type": "java.util.Map<java.lang.String,java.time.Duration>",
+      "sourceType": "cn.surveyking.server.core.config.CacheConfig"
+    },
+    {
+      "name": "file-storage.local.date-format",
+      "type": "java.lang.String",
+      "description": "日期格式",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties$LocalStorage"
+    },
+    {
+      "name": "file-storage.local.name-strategy",
+      "type": "java.lang.String",
+      "description": "文件名策略 1. seqAndOriginalName: 序列号加原文件名 2. originalNameAndSeq: 原文件名+序列号 3. Seq: 序列号（项目启动时间戳的自增） 4. UUID: 去除短杠'-'的UUID",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties$LocalStorage"
+    },
+    {
+      "name": "file-storage.local.path-strategy",
+      "type": "java.lang.String",
+      "description": "路劲策略： 1. byNo:所有文件存储在 rootPath 下 2. byId:按照项目的short-id分文件夹存储,例如 rootPath\/RyP2rR 3. byDate:按照上传日期存储，例如 rootPath\/2022\/06\/01",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties$LocalStorage"
+    },
+    {
+      "name": "file-storage.local.root-path",
+      "type": "java.lang.String",
+      "description": "本次存储目录的根目录",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties$LocalStorage"
+    },
+    {
+      "name": "file-storage.thumb-image.height",
+      "type": "java.lang.Integer",
+      "description": "生成的缩略图的高度",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties$ThumbImage"
+    },
+    {
+      "name": "file-storage.thumb-image.width",
+      "type": "java.lang.Integer",
+      "description": "生成的缩略图的宽度",
+      "sourceType": "cn.surveyking.server.storage.StorageProperties$ThumbImage"
+    },
+    {
+      "name": "sk.security.url-token-authentication.enabled",
+      "type": "java.lang.Boolean",
+      "description": "是否开启 token 认证",
+      "sourceType": "cn.surveyking.server.core.config.WebSecurityConfig$UrlTokenAuthentication"
+    }
+  ],
+  "hints": []
+}

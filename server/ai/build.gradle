@@ -1,0 +1,12 @@
+dependencies {
+    implementation project(':shared')
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+}
+
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
