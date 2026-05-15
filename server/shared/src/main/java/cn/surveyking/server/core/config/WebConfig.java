@@ -3,6 +3,8 @@ package cn.surveyking.server.core.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,6 +49,14 @@ public class WebConfig implements WebMvcConfigurer {
 	@GetMapping
 	public RedirectView index() {
 		return new RedirectView("/index.html");
+	}
+
+	/**
+	 * 健康检查端点 - 供 Railway/容器编排使用
+	 */
+	@GetMapping("/healthz")
+	public ResponseEntity<String> healthz() {
+		return new ResponseEntity<>("OK", HttpStatus.OK);
 	}
 
 }
