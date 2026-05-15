@@ -9,15 +9,15 @@ FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /build
 
-# 复制整个 server 目录（确保 gradle-wrapper.jar 等所有文件都进去）
+# 复制整个 server 目录（确保所有文件完整）
 COPY server/ ./server/
 
 # 赋予执行权限
 RUN chmod +x server/gradlew
 
-# 执行 Gradle 构建（生产模式 -Ppro）
+# 在 api 子模块目录下执行 Gradle 构建（bootJar 在 api 模块定义）
 RUN cd /build/server && \
-    ./gradlew bootJar -Ppro --no-daemon -Dorg.gradle.jvmargs="-Xmx1024m -Xms512m"
+    ./gradlew :api:bootJar -Ppro --no-daemon -Dorg.gradle.jvmargs="-Xmx1024m -Xms512m"
 
 # -------- 阶段2: 运行 --------
 FROM eclipse-temurin:17-jre-jammy
