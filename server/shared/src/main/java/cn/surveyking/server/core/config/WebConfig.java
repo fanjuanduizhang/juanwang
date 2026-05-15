@@ -2,6 +2,7 @@ package cn.surveyking.server.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
@@ -24,7 +25,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @RestController
-public class WebConfig implements WebMvcConfigurer {
+public class WebConfig implements WebMvcConfigurer, InitializingBean {
 
 	private final ObjectMapper objectMapper;
 
@@ -39,8 +40,8 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private String indexHtmlContent;
 
-	@jakarta.annotation.PostConstruct
-	public void init() throws Exception {
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		indexHtmlContent = StreamUtils.copyToString(indexHtml.getInputStream(), StandardCharsets.UTF_8);
 	}
 

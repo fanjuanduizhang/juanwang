@@ -7,6 +7,7 @@ import cn.surveyking.server.core.exception.ErrorCodeException;
 import cn.surveyking.server.core.exception.InternalServerError;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
@@ -30,15 +31,15 @@ import java.util.Map;
  */
 @ControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler implements InitializingBean {
 
 	@Value("classpath:/static/index.html")
 	private Resource indexHtml;
 
 	private String indexHtmlContent;
 
-	@jakarta.annotation.PostConstruct
-	public void init() throws Exception {
+	@Override
+	public void afterPropertiesSet() throws Exception {
 		indexHtmlContent = StreamUtils.copyToString(indexHtml.getInputStream(), StandardCharsets.UTF_8);
 	}
 
