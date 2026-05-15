@@ -7,6 +7,10 @@ bin/main/
 *.war
 *.class
 
+# 例外：Gradle Wrapper JAR 必须提交（Docker 构建需要）
+!gradle/wrapper/gradle-wrapper.jar
+!server/gradle/wrapper/gradle-wrapper.jar
+
 # === Gradle ===
 .gradle/
 
