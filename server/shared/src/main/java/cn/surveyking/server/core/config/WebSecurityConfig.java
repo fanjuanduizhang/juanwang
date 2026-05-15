@@ -62,11 +62,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http = http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and();
 
 		http = http.exceptionHandling().authenticationEntryPoint(authenticationEntryPoint).and();
-		// 所有请求都放行，目的是单 jar 部署，输入任意路由也能跳转到对应的页面，权限拦截通过注解配置
-
-		http.authorizeRequests().antMatchers("/api/public/**").permitAll().antMatchers("/api/system").permitAll()
-				.antMatchers("/captcha/get", "/captcha/check").permitAll().antMatchers(HttpMethod.GET, "/api/file/**")
-				.permitAll().antMatchers("/api/**").authenticated().antMatchers("/").permitAll();
+		// 所有非 /api 开头的请求都放行（单 jar 部署 SPA 模式）
+		// 权限拦截通过注解配置
+		http.authorizeRequests().antMatchers("/api/public/**", "/api/system",
+				"/captcha/get", "/captcha/check").permitAll()
+				.antMatchers(HttpMethod.GET, "/api/file/**").permitAll()
+				.antMatchers("/healthz", "/", "/error").permitAll()
+				.antMatchers("/**/*.css", "/**/*.js", "/**/*.jpg", "/**/*.png", "/**/*.svg",
+						"/**/*.eot", "/**/*.ttf", "/**/*.woff", "/**/favicon.ico").permitAll()
+				.antMatchers("/api/**").authenticated()
+				.anyRequest().permitAll();
 		http.addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
 	}
 
