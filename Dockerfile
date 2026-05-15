@@ -30,8 +30,8 @@ COPY --from=builder /build/server/api/build/libs/*.jar app.jar
 # 创建必要目录
 RUN mkdir -p /app/files /app/logs
 
-# 环境变量
-ENV JAVA_OPTS="-Xmx512m -Xms256m"
+# 环境变量（Railway 免费实例约 1GB 内存）
+ENV JAVA_OPTS="-Xmx768m -Xms384m -XX:+UseG1GC"
 ENV SPRING_PROFILES_ACTIVE=pro
 
 # 启动命令：使用 Railway 注入的 $PORT

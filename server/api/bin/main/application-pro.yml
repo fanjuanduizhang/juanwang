@@ -18,13 +18,13 @@ custom-cache:
     projectPermissionCache: 1d
     commonCache: 30d
 
-# Railway 部署：数据库连接从环境变量读取（优先级最高）
+# 直接使用 Railway MySQL 插件自动注入的变量（无需手动配置）
 spring:
   datasource:
-    driver-class-name: ${SPRING_DATASOURCE_DRIVER_CLASS_NAME:com.mysql.cj.jdbc.Driver}
-    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/surveyking?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
-    username: ${SPRING_DATASOURCE_USERNAME:root}
-    password: ${SPRING_DATASOURCE_PASSWORD:123456}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
+    username: ${MYSQLUSER}
+    password: ${MYSQLPASSWORD}
   sql:
     init:
       mode: always
