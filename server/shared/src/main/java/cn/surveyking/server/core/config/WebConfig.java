@@ -39,7 +39,7 @@ public class WebConfig implements WebMvcConfigurer {
 
 	private String indexHtmlContent;
 
-	@org.springframework.beans.factory.annotation.PostConstruct
+	@jakarta.annotation.PostConstruct
 	public void init() throws Exception {
 		indexHtmlContent = StreamUtils.copyToString(indexHtml.getInputStream(), StandardCharsets.UTF_8);
 	}
