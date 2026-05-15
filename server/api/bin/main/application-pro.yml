@@ -18,13 +18,13 @@ custom-cache:
     projectPermissionCache: 1d
     commonCache: 30d
 
-# 直接使用 Railway MySQL 插件自动注入的变量（无需手动配置）
+# 使用 SPRING_DATASOURCE_* 变量（Railway 手动配置）
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${MYSQLHOST}:${MYSQLPORT}/${MYSQLDATABASE}?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&createDatabaseIfNotExist=true
-    username: ${MYSQLUSER}
-    password: ${MYSQLPASSWORD}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
   sql:
     init:
       mode: always

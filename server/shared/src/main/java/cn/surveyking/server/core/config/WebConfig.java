@@ -8,11 +8,13 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -35,6 +37,13 @@ public class WebConfig implements WebMvcConfigurer {
 	@Value("classpath:/static/index.html")
 	private Resource indexHtml;
 
+	private String indexHtmlContent;
+
+	@org.springframework.beans.factory.annotation.PostConstruct
+	public void init() throws Exception {
+		indexHtmlContent = StreamUtils.copyToString(indexHtml.getInputStream(), StandardCharsets.UTF_8);
+	}
+
 	// 匹配类型的静态资源都会被 ResourceHandler 来处理
 	public static final String[] STATIC_RESOURCES = { "/**/*.css", "/**/*.js", "/**/*.jpg", "/**/*.png", "/**/*.svg", // 图片
 			"/**/*.eot", "/**/*.ttf", "/**/*.woff", "/**/favicon.ico" };
@@ -51,7 +60,9 @@ public class WebConfig implements WebMvcConfigurer {
 	 */
 	@GetMapping
 	public Object index() {
-		return ResponseEntity.ok().body(indexHtml);
+		return ResponseEntity.ok()
+				.header("Content-Type", "text/html;charset=UTF-8")
+				.body(indexHtmlContent);
 	}
 
 }
