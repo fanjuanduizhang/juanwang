@@ -2,20 +2,15 @@ package cn.surveyking.server.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.view.RedirectView;
 
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -25,7 +20,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 @RestController
-public class WebConfig implements WebMvcConfigurer, InitializingBean {
+public class WebConfig implements WebMvcConfigurer {
 
 	private final ObjectMapper objectMapper;
 
@@ -33,16 +28,6 @@ public class WebConfig implements WebMvcConfigurer, InitializingBean {
 	public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
 		// 允许 controller 直接返回 string
 		converters.add(0, new MappingJackson2HttpMessageConverter(objectMapper));
-	}
-
-	@Value("classpath:/static/index.html")
-	private Resource indexHtml;
-
-	private String indexHtmlContent;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		indexHtmlContent = StreamUtils.copyToString(indexHtml.getInputStream(), StandardCharsets.UTF_8);
 	}
 
 	// 匹配类型的静态资源都会被 ResourceHandler 来处理
@@ -57,13 +42,11 @@ public class WebConfig implements WebMvcConfigurer, InitializingBean {
 	}
 
 	/**
-	 * @return
+	 * 首页 - 重定向到 /index.html 让静态资源处理器来服务
 	 */
 	@GetMapping
-	public Object index() {
-		return ResponseEntity.ok()
-				.header("Content-Type", "text/html;charset=UTF-8")
-				.body(indexHtmlContent);
+	public RedirectView index() {
+		return new RedirectView("/index.html");
 	}
 
 }

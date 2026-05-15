@@ -7,22 +7,18 @@ import cn.surveyking.server.core.exception.ErrorCodeException;
 import cn.surveyking.server.core.exception.InternalServerError;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.ValidationException;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -31,23 +27,11 @@ import java.util.Map;
  */
 @ControllerAdvice
 @Slf4j
-public class GlobalExceptionHandler implements InitializingBean {
-
-	@Value("classpath:/static/index.html")
-	private Resource indexHtml;
-
-	private String indexHtmlContent;
-
-	@Override
-	public void afterPropertiesSet() throws Exception {
-		indexHtmlContent = StreamUtils.copyToString(indexHtml.getInputStream(), StandardCharsets.UTF_8);
-	}
+public class GlobalExceptionHandler {
 
 	@ExceptionHandler(NoHandlerFoundException.class)
 	public Object handleError404(HttpServletRequest request, Exception e) {
-		return ResponseEntity.ok()
-				.header("Content-Type", "text/html;charset=UTF-8")
-				.body(indexHtmlContent);
+		return new RedirectView("/index.html");
 	}
 
 	@ExceptionHandler(ValidationException.class)
@@ -78,6 +62,7 @@ public class GlobalExceptionHandler implements InitializingBean {
 	public ResponseEntity<ApiResponse<Map<String, String>>> handleMethodArgumentNotValidException(
 			HttpServletRequest request, MethodArgumentNotValidException ex) {
 		log.error("handleMethodArgumentNotValidException {}\n", request.getRequestURI(), ex);
+
 		return ResponseEntity.ok().body(new ApiResponse<>(ResponseCode.FAIL.code, "Method argument validation failed"));
 	}
 
