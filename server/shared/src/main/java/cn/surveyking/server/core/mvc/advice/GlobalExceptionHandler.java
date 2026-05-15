@@ -7,18 +7,22 @@ import cn.surveyking.server.core.exception.ErrorCodeException;
 import cn.surveyking.server.core.exception.InternalServerError;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
-import org.springframework.web.servlet.view.RedirectView;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import javax.validation.ValidationException;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 /**
@@ -29,9 +33,14 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+	@Value("classpath:/static/index.html")
+	private Resource indexHtml;
+
 	@ExceptionHandler(NoHandlerFoundException.class)
-	public Object handleError404(HttpServletRequest request, Exception e) {
-		return new RedirectView("/index.html");
+	public void handleError404(HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		response.setStatus(200);
+		StreamUtils.copy(indexHtml.getInputStream(), response.getOutputStream());
 	}
 
 	@ExceptionHandler(ValidationException.class)

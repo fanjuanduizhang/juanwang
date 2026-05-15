@@ -2,17 +2,21 @@ package cn.surveyking.server.core.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.view.RedirectView;
 
+import jakarta.servlet.http.HttpServletResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 /**
@@ -43,12 +47,17 @@ public class WebConfig implements WebMvcConfigurer {
 				.setCachePeriod(3600 * 24);
 	}
 
+	@Value("classpath:/static/index.html")
+	private Resource indexHtml;
+
 	/**
-	 * 首页 - 重定向到 /index.html 让静态资源处理器来服务
+	 * 首页 - 直接输出 index.html 内容（解决 JAR 包中 Resource.getFile() 失效问题）
 	 */
 	@GetMapping
-	public RedirectView index() {
-		return new RedirectView("/index.html");
+	public void index(HttpServletResponse response) throws Exception {
+		response.setContentType("text/html;charset=UTF-8");
+		response.setStatus(HttpStatus.OK.value());
+		StreamUtils.copy(indexHtml.getInputStream(), response.getOutputStream());
 	}
 
 	/**
