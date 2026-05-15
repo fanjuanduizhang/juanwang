@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:1991}  # Railway 会通过 $PORT 环境变量注入端口
+  port: ${PORT:1991}
   servlet:
     session:
       timeout: 1h
@@ -25,3 +25,16 @@ spring:
     url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/surveyking?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
     username: ${SPRING_DATASOURCE_USERNAME:root}
     password: ${SPRING_DATASOURCE_PASSWORD:123456}
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+      schema-locations: classpath:scripts/init-mysql.sql
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    call-setters-on-nulls: false
+  global-config:
+    db-config:
+      logic-delete-field: deleted
