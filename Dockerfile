@@ -9,26 +9,15 @@ FROM eclipse-temurin:17-jdk-jammy AS builder
 
 WORKDIR /build
 
-# 先复制 Gradle wrapper 和构建配置（利用 Docker 缓存层）
-COPY server/gradlew server/gradlew.bat server/gradle/ ./server/
-COPY server/build.gradle server/settings.gradle ./server/
-
-# 复制所有子模块源码
-COPY server/shared/ ./server/shared/
-COPY server/rdbms/ ./server/rdbms/
-COPY server/flow/ ./server/flow/
-COPY server/exam/ ./server/exam/
-COPY server/ai/ ./server/ai/
-COPY server/api/ ./server/api/
+# 复制整个 server 目录（确保 gradle-wrapper.jar 等所有文件都进去）
+COPY server/ ./server/
 
 # 赋予执行权限
 RUN chmod +x server/gradlew
 
 # 执行 Gradle 构建（生产模式 -Ppro）
-# 限制 JVM 内存避免 OOM，关闭守护进程
-RUN cd server && \
-    chmod +x gradlew && \
-    ./gradlew bootJar -Ppro --no-daemon --parallel -Dorg.gradle.jvmargs="-Xmx1024m -Xms512m"
+RUN cd /build/server && \
+    ./gradlew bootJar -Ppro --no-daemon -Dorg.gradle.jvmargs="-Xmx1024m -Xms512m"
 
 # -------- 阶段2: 运行 --------
 FROM eclipse-temurin:17-jre-jammy
