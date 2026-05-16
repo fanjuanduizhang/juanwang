@@ -19,7 +19,7 @@ CREATE TABLE `t_account` (
   `update_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='登录账号';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='登录账号';
 
 -- ----------------------------
 -- Records of t_account
@@ -1147,7 +1147,7 @@ CREATE TABLE `t_dashboard` (
   `update_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='仪表�?;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='仪表�?;
 
 -- ----------------------------
 -- Records of t_dashboard
@@ -1175,7 +1175,7 @@ CREATE TABLE `t_dept` (
   `update_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='组织机构';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='组织机构';
 
 -- ----------------------------
 -- Records of t_dept
@@ -1225,7 +1225,7 @@ CREATE TABLE `t_position` (
   `update_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='岗位';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='岗位';
 
 -- ----------------------------
 -- Records of t_position
@@ -1379,7 +1379,7 @@ CREATE TABLE `t_role` (
   `update_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='角色';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='角色';
 
 -- ----------------------------
 -- Records of t_role
@@ -1524,7 +1524,7 @@ CREATE TABLE `t_user` (
   `profile` varchar(255) DEFAULT NULL COMMENT '个人简�?,
   `correct_times` int DEFAULT NULL COMMENT '错题答对清除次数',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='系统用户';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='系统用户';
 
 -- ----------------------------
 -- Records of t_user
@@ -1575,7 +1575,7 @@ CREATE TABLE `t_user_position` (
   `update_at` timestamp NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='用户岗位';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户岗位';
 
 -- ----------------------------
 -- Records of t_user_position
@@ -1597,7 +1597,7 @@ CREATE TABLE `t_user_role` (
   `update_by` varchar(256) DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `idx_t_user_role` (`user_type`,`user_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COMMENT='用户角色关联';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户角色关联';
 
 -- ----------------------------
 -- Records of t_user_role

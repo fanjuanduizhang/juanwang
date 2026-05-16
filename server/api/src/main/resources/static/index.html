@@ -203,19 +203,15 @@
     <script>
       // 隐藏右上角帮助图标（问号❓）
       setInterval(function() {
-        // Ant Design Pro 帮助按钮通常带有 title="使用文档" 或包含 question-circle 图标
         var all = document.querySelectorAll('span[title="使用文档"], span[title="Help"], a[title="使用文档"], a[title="Help"]');
         all.forEach(function(el) { el.style.display = 'none'; });
-        // 也通过 aria-label 匹配
         var all2 = document.querySelectorAll('[aria-label="使用文档"], [aria-label="Help"]');
         all2.forEach(function(el) { el.style.display = 'none'; });
-        // 通过 question-circle 图标匹配父级按钮
         var icons = document.querySelectorAll('[data-icon="question-circle"]');
         icons.forEach(function(icon) {
           var p = icon.closest('span') || icon.closest('a') || icon.closest('div');
           if (p) p.style.display = 'none';
         });
-        // 隐藏包含问号SVG的按钮
         document.querySelectorAll('button, a, [role="button"]').forEach(function(el) {
           var html = el.innerHTML || '';
           if (html.includes('question-circle') || html.includes('QuestionCircle') || el.textContent.trim() === '?') {
@@ -223,6 +219,151 @@
           }
         });
       }, 500);
+
+      // ========== 注册功能注入 ==========
+      (function() {
+        var REG_CSS = '.sk-reg-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:10000;display:flex;align-items:center;justify-content:center}.sk-reg-modal{background:#fff;border-radius:8px;width:400px;max-width:90vw;padding:32px 24px;box-shadow:0 6px 16px rgba(0,0,0,.15)}.sk-reg-title{text-align:center;font-size:20px;font-weight:600;margin-bottom:24px;color:#333}.sk-reg-form .sk-reg-item{margin-bottom:16px}.sk-reg-form label{display:block;font-size:14px;color:#666;margin-bottom:6px;font-weight:500}.sk-reg-form input,.sk-reg-form select{width:100%;height:40px;border:1px solid #d9d9d9;border-radius:4px;padding:0 12px;font-size:14px;box-sizing:border-box;transition:border-color .3s}.sk-reg-form input:focus,.sk-reg-form select:focus{border-color:#3873f6;outline:none;box-shadow:0 0 0 2px rgba(56,115,246,.1)}.sk-reg-btn{width:100%;height:40px;background:#3873f6;color:#fff;border:none;border-radius:4px;font-size:15px;font-weight:500;cursor:pointer;transition:background .3s}.sk-reg-btn:hover{background:#2e5fd4}.sk-reg-btn:disabled{background:#a0c0ff;cursor:not-allowed}.sk-reg-footer{text-align:center;margin-top:16px;font-size:14px;color:#999}.sk-reg-footer a{color:#3873f6;text-decoration:none;cursor:pointer}.sk-reg-footer a:hover{text-decoration:underline}.sk-reg-link-wrap{text-align:center;margin-top:12px}.sk-reg-link{color:#3873f6;text-decoration:none;cursor:pointer;font-size:14px}.sk-reg-link:hover{text-decoration:underline}.sk-reg-msg{font-size:13px;padding:8px 12px;border-radius:4px;margin-bottom:12px;display:none;text-align:center}.sk-reg-msg.err{background:#fff2f0;border:1px solid #ffccc7;color:#cf1322}.sk-reg-msg.ok{background:#f6ffed;border:1px solid #b7eb8f;color:#389e0d}';
+
+        function injectStyle() {
+          if (document.getElementById('sk-reg-css')) return;
+          var s = document.createElement('style'); s.id = 'sk-reg-css'; s.textContent = REG_CSS;
+          document.head.appendChild(s);
+        }
+
+        function createModal() {
+          var div = document.createElement('div'); div.id = 'sk-reg-modal'; div.className = 'sk-reg-overlay'; div.style.display = 'none';
+          div.innerHTML =
+            '<div class="sk-reg-modal">' +
+              '<div class="sk-reg-title">注册新账户</div>' +
+              '<div id="sk-reg-msg" class="sk-reg-msg"></div>' +
+              '<div class="sk-reg-form">' +
+                '<div class="sk-reg-item"><label>姓名</label><input id="sk-r-name" placeholder="请输入真实姓名" /></div>' +
+                '<div class="sk-reg-item"><label>用户名 <span style="color:red">*</span></label><input id="sk-r-username" placeholder="用于登录的用户名" /></div>' +
+                '<div class="sk-reg-item"><label>密码 <span style="color:red">*</span></label><input id="sk-r-password" type="password" placeholder="请输入密码" /></div>' +
+                '<div class="sk-reg-item" id="sk-r-role-wrap" style="display:none"><label>角色</label><select id="sk-r-role"><option value="">默认角色</option></select></div>' +
+                '<button class="sk-reg-btn" id="sk-reg-submit">注 册</button>' +
+              '</div>' +
+              '<div class="sk-reg-footer"><a id="sk-back-login">已有账号？返回登录</a></div>' +
+            '</div>';
+          document.body.appendChild(div);
+
+          // events
+          div.addEventListener('click', function(e) { if (e.target === div) hideModal(); });
+          document.getElementById('sk-back-login').onclick = hideModal;
+          document.getElementById('sk-reg-submit').onclick = doRegister;
+
+          // enter key submit
+          [document.getElementById('sk-r-username'), document.getElementById('sk-r-password'), document.getElementById('sk-r-name')].forEach(function(inp) {
+            inp.onkeydown = function(e) { if (e.key === 'Enter') doRegister(); };
+          });
+        }
+
+        function showModal() { injectStyle(); if (!document.getElementById('sk-reg-modal')) createModal(); document.getElementById('sk-reg-modal').style.display = 'flex'; loadRoles(); }
+        function hideModal() { var m = document.getElementById('sk-reg-modal'); if (m) m.style.display = 'none'; }
+
+        function showMsg(txt, type) { var el = document.getElementById('sk-reg-msg'); el.textContent = txt; el.className = 'sk-reg-msg ' + (type || ''); el.style.display = 'block'; }
+        function clearMsg() { var el = document.getElementById('sk-reg-msg'); el.style.display = 'none'; }
+
+        function loadRoles() {
+          fetch('/api/public/listRegisterRole').then(function(r) { return r.json(); }).then(function(data) {
+            var sel = document.getElementById('sk-r-role');
+            sel.innerHTML = '<option value="">默认角色</option>';
+            var wrap = document.getElementById('sk-r-role-wrap');
+            if (data && data.code === 200 && data.data && data.data.length > 0) {
+              wrap.style.display = '';
+              data.data.forEach(function(role) { var opt = document.createElement('option'); opt.value = role.id; opt.textContent = role.name; sel.appendChild(opt); });
+            } else {
+              wrap.style.display = 'none';
+            }
+          }).catch(function() {});
+        }
+
+        function doRegister() {
+          var username = document.getElementById('sk-r-username').value.trim();
+          var password = document.getElementById('sk-r-password').value;
+          var name = document.getElementById('sk-r-name').value.trim();
+          var roleEl = document.getElementById('sk-r-role');
+
+          if (!username) return showMsg('请输入用户名', 'err');
+          if (!password) return showMsg('请输入密码', 'err');
+          if (password.length < 6) return showMsg('密码至少6位', 'err');
+
+          var body = { username: username, password: password };
+          if (name) body.name = name;
+          var roleVal = roleEl.value;
+          if (roleVal && roleEl.parentNode.style.display !== 'none') body.role = roleVal;
+
+          var btn = document.getElementById('sk-reg-submit'); btn.disabled = true; btn.textContent = '注册中...';
+
+          fetch('/api/public/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body)
+          }).then(function(r) { return r.json(); }).then(function(data) {
+            btn.disabled = false; btn.textContent = '注 册';
+            if (data.code === 200 || data.code === 0) {
+              showMsg('✅ 注册成功！即将跳转到登录页...', 'ok');
+              setTimeout(hideModal, 1500);
+            } else {
+              showMsg('⚠️ ' + (data.msg || data.message || '注册失败，请联系管理员'), 'err');
+            }
+          }).catch(function(err) {
+            btn.disabled = false; btn.textContent = '注 册';
+            showMsg('❌ 网络错误：' + err.message, 'err');
+          });
+        }
+
+        // 注入"注册账号"链接到登录页
+        function tryInjectRegLink() {
+          // Ant Design Pro 登录页的提交按钮区域附近注入
+          var selectors = [
+            'button[type="submit"]',
+            '.ant-btn-primary',
+            '[class*="submit"]',
+            'form button'
+          ];
+          for (var i = 0; i < selectors.length; i++) {
+            var btns = document.querySelectorAll(selectors[i]);
+            for (var j = 0; j < btns.length; j++) {
+              var btn = btns[j];
+              // 找登录提交按钮（在登录页面路径上）
+              var text = (btn.textContent || '').trim();
+              if ((text === '登 录' || text === 'Login' || text === '登录') && !btn.dataset.skRegDone) {
+                btn.dataset.skRegDone = '1';
+                var parent = btn.parentElement || btn.parentNode;
+                if (parent) {
+                  var linkWrap = document.createElement('div'); linkWrap.className = 'sk-reg-link-wrap';
+                  linkWrap.innerHTML = '<a class="sk-reg-link" id="sk-show-reg">还没有账号？立即注册 →</a>';
+                  parent.appendChild(linkWrap);
+                  parent.style.textAlign = 'center';
+                  document.getElementById('sk-show-reg').onclick = showModal;
+                  return true;
+                }
+              }
+            }
+          }
+          return false;
+        }
+
+        // 轮询检测登录页渲染完成
+        var _regInjected = false;
+        var _regCheckCount = 0;
+        function checkAndInject() {
+          if (_regInjected) return;
+          if (_regCheckCount++ > 120) return; // 最多检查60秒
+          if (tryInjectRegLink()) { _regInjected = true; }
+        }
+        setInterval(checkAndInject, 500);
+        // 也监听 URL 变化（SPA路由切换）
+        var _lastUrl = location.href;
+        setInterval(function() {
+          if (location.href !== _lastUrl) {
+            _lastUrl = location.href;
+            _regInjected = false; _regCheckCount = 0;
+            checkAndInject();
+          }
+        }, 800);
+      })();
     </script>
   </body>
 </html>
