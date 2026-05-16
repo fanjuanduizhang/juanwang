@@ -25,7 +25,7 @@ CREATE TABLE `t_account` (
 -- Records of t_account
 -- ----------------------------
 INSERT IGNORE INTO `t_account` (`id`,`user_type`,`user_id`,`auth_type`,`auth_account`,`auth_secret`,`secret_salt`,`status`,`is_deleted`,`create_at`,`create_by`,`update_at`,`update_by`) VALUES
-('1','SysUser','1457995481966747649','PWD','admin','$2a$10$o7/dj563TTOYKQTUIrqmPupm7eVFgtf.lzSecTMc1rQNwR68qgGO.',NULL,1,0,'2026-05-04 19:52:40',NULL,'2026-05-04 19:52:40','2'),
+('1','SysUser','1457995481966747649','PWD','admin','$2a$10$AsLNzqhYUImR8CVNblNyCuCLnroiJnv/13M5ipihZ3Vhtq6J8AolW',NULL,1,0,'2026-05-04 19:52:40',NULL,'2026-05-04 19:52:40','2'),
 ('2','SysUser','2','PWD','yang','$2a$10$vZk9P3XtbD2KrdLbQYPvBuPAkkUda0OlkDg7io1Q6VEtfFPig/tqO',NULL,1,0,'2026-05-04 13:00:11',NULL,'2026-05-04 13:03:45','1457995481966747649'),
 ('2051167474530910209','SysUser','2051167474262474753','PWD','li','$2a$10$ThPiQYr.pu6GT99hC38XZO6AbkxCV8eJgcW.6psqX1IeSLSOAUNza',NULL,1,1,'2026-05-04 13:10:09',NULL,'2026-05-04 19:29:40',NULL),
 ('2051226029627809794','SysUser','2051226029048995841','PWD','testadmin','$2a$10$/8IKJJHq7NLuMi9rmPm./.QIi2GZeruvHLuLmlkRjFK/OSi/YfSW2',NULL,1,1,'2026-05-04 17:02:50',NULL,'2026-05-04 19:29:48',NULL),
