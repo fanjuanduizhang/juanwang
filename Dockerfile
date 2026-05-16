@@ -27,11 +27,16 @@ RUN mkdir -p /app/files /app/logs
 
 ENV JAVA_OPTS="-Xmx768m -Xms384m -XX:+UseG1GC"
 ENV SPRING_PROFILES_ACTIVE=pro
-ENV PORT=7007
 
+# 完全使用 Railway 注入的 PORT，不加任何硬编码
+# 打印完整环境信息用于 Deploy Logs 调试
 ENTRYPOINT ["sh", "-c", \
-    "echo '=== PORT='$PORT' ===' && \
+    "echo '=== SURVEYKING START ===' && \
+     echo 'PORT='$PORT && \
+     echo 'RAILWAY_ENVIRONMENT='$RAILWAY_ENVIRONMENT && \
+     echo 'RAILWAY_SERVICE_NAME='$RAILWAY_SERVICE_NAME && \
+     echo '=== END DEBUG ===' && \
     java ${JAVA_OPTS} \
       -Dserver.address=0.0.0.0 \
-      -Dserver.port=$PORT \
+      -Dserver.port=${PORT:-8080} \
       -jar app.jar"]
