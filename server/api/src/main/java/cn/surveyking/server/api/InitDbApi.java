@@ -74,8 +74,8 @@ public class InitDbApi {
 						} catch (Exception e) {
 							errorCount++;
 							String errMsg = e.getMessage();
-							if (errMsg != null && errMsg.length() > 120) {
-								errMsg = errMsg.substring(0, 120);
+							if (errMsg != null && errMsg.length() > 500) {
+								errMsg = errMsg.substring(0, 500);
 							}
 							if (errors.size() < 5) {
 								errors.add("[" + total + "] " + truncateStatement(statement)
