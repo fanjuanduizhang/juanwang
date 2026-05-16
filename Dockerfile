@@ -34,5 +34,7 @@ RUN mkdir -p /app/files /app/logs
 ENV JAVA_OPTS="-Xmx768m -Xms384m -XX:+UseG1GC"
 ENV SPRING_PROFILES_ACTIVE=pro
 
-# 启动命令：使用 Railway 注入的 $PORT
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -Dserver.port=${PORT:-8080} -jar app.jar"]
+# 启动命令：
+# Railway 自动注入 $PORT 环境变量，应用必须监听此端口
+# 打印 PORT 值便于调试（可在 Deploy Logs 中查看）
+ENTRYPOINT ["sh", "-c", "echo \"=== Railway PORT=$PORT ===\" && java ${JAVA_OPTS} -Dserver.port=${PORT:-8080} -jar app.jar"]

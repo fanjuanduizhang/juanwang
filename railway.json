@@ -12,7 +12,6 @@
     "restartPolicyMaxRetries": 10
   },
   "variables": {
-    "SPRING_PROFILES_ACTIVE": "pro",
-    "PORT": "7007"
+    "SPRING_PROFILES_ACTIVE": "pro"
   }
 }
