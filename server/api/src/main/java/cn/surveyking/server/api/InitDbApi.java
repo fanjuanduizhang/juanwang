@@ -65,22 +65,8 @@ public class InitDbApi {
 						sb.setLength(0);
 						total++;
 
-						// 清理 SQL：修复损坏的字符串字面量
+						// 清理 SQL（安全措施：防御性修复任何潜在编码问题）
 						String statement = sanitizeSql(rawStatement);
-
-						// DEBUG: 打印前几条语句的原始/清理后内容
-						if (total <= 8) {
-							log.info("[Init DB] #{} original length={}, sanitized length={}",
-									total, rawStatement.length(), statement.length());
-							if (total <= 3) {
-								log.info("[Init DB] #{} ORIGINAL: {}", total,
-										rawStatement.replaceAll("\\s+", " ").substring(0,
-												Math.min(150, rawStatement.replaceAll("\\s+", " ").length())));
-								log.info("[Init DB] #{} SANITIZED: {}", total,
-										statement.replaceAll("\\s+", " ").substring(0,
-												Math.min(150, statement.replaceAll("\\s+", " ").length())));
-							}
-						}
 
 						try {
 							stmt.execute(statement);
