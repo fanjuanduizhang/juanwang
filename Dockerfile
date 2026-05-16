@@ -27,11 +27,11 @@ RUN mkdir -p /app/files /app/logs
 
 ENV JAVA_OPTS="-Xmx768m -Xms384m -XX:+UseG1GC"
 ENV SPRING_PROFILES_ACTIVE=pro
+ENV PORT=7007
 
-# 固定监听 0.0.0.0:7007
 ENTRYPOINT ["sh", "-c", \
-    "echo '=== Starting on 0.0.0.0:7007 ===' && \
+    "echo '=== PORT='$PORT' ===' && \
     java ${JAVA_OPTS} \
       -Dserver.address=0.0.0.0 \
-      -Dserver.port=7007 \
+      -Dserver.port=$PORT \
       -jar app.jar"]
