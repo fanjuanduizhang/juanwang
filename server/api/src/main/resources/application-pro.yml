@@ -27,9 +27,7 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
   sql:
     init:
-      mode: always
-      continue-on-error: true
-      schema-locations: classpath:scripts/init-mysql.sql
+      mode: never
 
 mybatis-plus:
   configuration:
