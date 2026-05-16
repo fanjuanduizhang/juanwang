@@ -19,8 +19,8 @@ RUN chmod +x /build/server/gradlew && \
 # 再复制完整源码（变化频率高，单独一层）
 COPY server/ ./server/
 
-# 构建产物
-RUN cd /build/server && \
+RUN chmod +x /build/server/gradlew && \
+    cd /build/server && \
     ./gradlew :api:bootJar -Ppro --no-daemon -Dorg.gradle.jvmargs="-Xmx1024m -Xms512m"
 
 # -------- 阶段2: 运行 --------
