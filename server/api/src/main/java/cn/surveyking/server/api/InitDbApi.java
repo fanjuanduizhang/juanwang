@@ -61,9 +61,12 @@ public class InitDbApi {
 
 					// 以分号结尾的行 → 执行完整语句
 					if (trimmed.endsWith(";")) {
-						String statement = sb.toString().trim();
+						String rawStatement = sb.toString().trim();
 						sb.setLength(0);
 						total++;
+
+						// 清理 SQL：修复损坏的字符串字面量
+						String statement = sanitizeSql(rawStatement);
 
 						try {
 							stmt.execute(statement);
@@ -88,7 +91,7 @@ public class InitDbApi {
 
 				// 处理最后一个没有分号的语句（如果有）
 				if (sb.length() > 0) {
-					String statement = sb.toString().trim();
+					String statement = sanitizeSql(sb.toString().trim());
 					total++;
 					try {
 						stmt.execute(statement);
@@ -123,6 +126,73 @@ public class InitDbApi {
 		}
 
 		return ResponseEntity.ok(result);
+	}
+
+	/**
+	 * 清理 SQL 语句中的编码损坏。
+	 * 
+	 * 原始 init-mysql.sql 中部分中文 COMMENT 值存在 UTF-8 截断损坏：
+	 * - 完整中文 char 的末尾字节被替换为 '?'
+	 * - 且丢失了闭合单引号，导致 MySQL syntax error
+	 * 
+	 * 例如: COMMENT '加密?,  应为  COMMENT '加密盐',
+	 * 修复为: COMMENT '加密',    （截断但语法正确）
+	 */
+	private String sanitizeSql(String sql) {
+		if (sql == null || sql.isEmpty()) {
+			return sql;
+		}
+
+		StringBuilder result = new StringBuilder(sql.length());
+		boolean inQuote = false;
+		int length = sql.length();
+
+		for (int i = 0; i < length; i++) {
+			char c = sql.charAt(i);
+
+			// 处理单引号（字符串边界）
+			if (c == '\'') {
+				// 检查转义引号 ''
+				if (inQuote && i + 1 < length && sql.charAt(i + 1) == '\'') {
+					result.append('\'');
+					result.append('\'');
+					i++; // 跳过下一个 '
+					continue;
+				}
+				inQuote = !inQuote;
+				result.append(c);
+				continue;
+			}
+
+			// 不在引号内 → 直接保留
+			if (!inQuote) {
+				result.append(c);
+				continue;
+			}
+
+			// 在引号内：检测 ? 后跟 , \n 或 end-of-statement（无闭合引号标志）
+			if (c == '?' && i + 1 < length) {
+				char next = sql.charAt(i + 1);
+				// 如果 ? 后面是逗号、换行或分号，说明这是截断损坏
+				// 跳过这个 ?，并提前关闭引号
+				if (next == ',' || next == '\n' || next == '\r' || next == ';') {
+					// 补上闭合引号
+					result.append('\'');
+					// 不消耗下一个字符（让外层循环正常处理 , \n ;）
+					continue;
+				}
+			}
+
+			// 引号内的普通字符，直接保留
+			result.append(c);
+		}
+
+		// 如果还在引号内（行尾未闭合），补上闭合引号
+		if (inQuote) {
+			result.append('\'');
+		}
+
+		return result.toString();
 	}
 
 	private String truncateStatement(String sql) {
