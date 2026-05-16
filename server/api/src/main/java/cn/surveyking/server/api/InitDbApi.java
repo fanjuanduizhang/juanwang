@@ -68,6 +68,11 @@ public class InitDbApi {
 						// 清理 SQL（安全措施：防御性修复任何潜在编码问题）
 						String statement = sanitizeSql(rawStatement);
 
+						// 将 INSERT IGNORE 转为 REPLACE INTO，确保覆盖 Railway 上可能存在的旧数据
+						if (statement.startsWith("INSERT IGNORE")) {
+							statement = statement.replaceFirst("INSERT IGNORE\\s+INTO", "REPLACE INTO");
+						}
+
 						try {
 							stmt.execute(statement);
 							successCount++;
