@@ -4,19 +4,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.sql.Connection;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 数据库初始化接口（Railway 部署专用）
@@ -31,9 +30,6 @@ public class InitDbApi {
 	@Autowired
 	private DataSource dataSource;
 
-	private static final Pattern STATEMENT_DELIMITER = Pattern.compile(
-			";\\s*$", Pattern.MULTILINE);
-
 	@PostMapping("/public/init-db")
 	public ResponseEntity<Map<String, Object>> initDatabase() {
 		Map<String, Object> result = new LinkedHashMap<>();
@@ -45,13 +41,14 @@ public class InitDbApi {
 		int successCount = 0;
 		int errorCount = 0;
 
-		try {
-			JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-			
+		try (Connection conn = dataSource.getConnection()) {
+			conn.setAutoCommit(true);
+
 			ClassPathResource resource = new ClassPathResource("scripts/init-mysql.sql");
 			try (BufferedReader reader = new BufferedReader(
-					new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8))) {
-				
+					new InputStreamReader(resource.getInputStream(), StandardCharsets.UTF_8));
+					Statement stmt = conn.createStatement()) {
+
 				StringBuilder sb = new StringBuilder();
 				String line;
 				while ((line = reader.readLine()) != null) {
@@ -61,17 +58,16 @@ public class InitDbApi {
 						continue;
 					}
 					sb.append(line).append("\n");
-					
+
 					// 以分号结尾的行 → 执行完整语句
 					if (trimmed.endsWith(";")) {
 						String statement = sb.toString().trim();
 						sb.setLength(0);
 						total++;
-						
+
 						try {
-							jdbc.execute(statement);
+							stmt.execute(statement);
 							successCount++;
-							// 记录前3个成功语句的摘要
 							if (successes.size() < 3) {
 								successes.add(truncateStatement(statement));
 							}
@@ -81,22 +77,21 @@ public class InitDbApi {
 							if (errMsg != null && errMsg.length() > 120) {
 								errMsg = errMsg.substring(0, 120);
 							}
-							// 只记录前5个错误
 							if (errors.size() < 5) {
-								errors.add("[" + total + "] " + truncateStatement(statement) 
+								errors.add("[" + total + "] " + truncateStatement(statement)
 										+ " => " + errMsg);
 							}
 							log.warn("[Init DB] Statement #{} failed: {}", total, errMsg);
 						}
 					}
 				}
-				
+
 				// 处理最后一个没有分号的语句（如果有）
 				if (sb.length() > 0) {
 					String statement = sb.toString().trim();
 					total++;
 					try {
-						jdbc.execute(statement);
+						stmt.execute(statement);
 						successCount++;
 					} catch (Exception e) {
 						errorCount++;
@@ -108,17 +103,17 @@ public class InitDbApi {
 			result.put("totalStatements", total);
 			result.put("successCount", successCount);
 			result.put("errorCount", errorCount);
-			result.put("status", errorCount == 0 ? "ALL_OK" : 
+			result.put("status", errorCount == 0 ? "ALL_OK" :
 					(successCount > 0 ? "PARTIAL" : "FAILED"));
-			
+
 			if (!successes.isEmpty()) {
 				result.put("sampleSuccesses", successes);
 			}
 			if (!errors.isEmpty()) {
 				result.put("errors", errors);
 			}
-			
-			log.info("[Init DB] Complete: {}/{}/{} (total/success/error)", 
+
+			log.info("[Init DB] Complete: {}/{}/{} (total/success/error)",
 					total, successCount, errorCount);
 
 		} catch (Exception e) {
