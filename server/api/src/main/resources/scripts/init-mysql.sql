@@ -1615,3 +1615,4 @@ INSERT IGNORE INTO `t_user_role` (`id`, `user_type`, `user_id`, `role_id`, `crea
 
 SET FOREIGN_KEY_CHECKS = 1;
 SET FOREIGN_KEY_CHECKS = 1;
+
