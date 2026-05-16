@@ -230,6 +230,16 @@
           document.head.appendChild(s);
         }
 
+        // 隐藏原前端自带的注册入口（避免与我们注入的重复）
+        function hideOriginalRegister() {
+          document.querySelectorAll('a, span, div, button').forEach(function(el) {
+            var t = (el.textContent || '').trim();
+            if (t === '注册账户' || t === '注册账号' || t === 'Register') {
+              el.style.display = 'none';
+            }
+          });
+        }
+
         function createModal() {
           var div = document.createElement('div'); div.id = 'sk-reg-modal'; div.className = 'sk-reg-overlay'; div.style.display = 'none';
           div.innerHTML =
@@ -351,6 +361,7 @@
         function checkAndInject() {
           if (_regInjected) return;
           if (_regCheckCount++ > 120) return; // 最多检查60秒
+          hideOriginalRegister(); // 每次都隐藏原前端自带的注册链接
           if (tryInjectRegLink()) { _regInjected = true; }
         }
         setInterval(checkAndInject, 500);
