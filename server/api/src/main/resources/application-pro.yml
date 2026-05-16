@@ -1,5 +1,5 @@
 server:
-  port: ${PORT:1991}
+  port: ${PORT:7007}
   servlet:
     session:
       timeout: 1h
